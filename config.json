@@ -1,0 +1,126 @@
+{
+  "scripts": [
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": true,
+      "run_on_startup": true,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "z"],
+      "hotkey_action": "toggle",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "s"],
+      "hotkey_action": "toggle",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "c"],
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "is_external_app": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "m"],
+      "hotkey_action": "toggle",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "n"],
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "l"],
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "d"],
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": "not_a_list",
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "hotkey": ["<ctrl>", "<alt>", "x"],
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "description": ""
+    },
+    {
+      "name": "",
+      "path": "",
+      "args": [],
+      "enabled": false,
+      "run_on_startup": false,
+      "run_hotkey": false,
+      "needs_gui": false,
+      "description": ""
+    }
+  ],
+  "global_settings": {
+    "log_directory": ""
+  }
+}
