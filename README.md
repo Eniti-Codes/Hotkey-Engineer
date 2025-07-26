@@ -55,14 +55,14 @@ This script streamlines the installation by presenting an interactive menu for i
     Before you can run the script, you need to give it permission to execute.
 
     ```bash
-    chmod +x setup.sh
+    chmod +x Setup.sh
     ```
 
 6.  **Run the Setup Script with `sudo`:**
     Execute the script using `sudo`. This is **required** because the script sets up a system-level `systemd` user service to allow the Python script to run automatically and manages files in system-level directories. While the `setup.sh` script requires `sudo`, the main `Hotkey-Engineer.py` Python script itself does ***not*** run with `sudo` privileges.
 
     ```bash
-    sudo ./setup.sh
+    sudo ./Setup.sh
     ```
 
 7.  **Follow the On-Screen Prompts:**
