@@ -1,153 +1,200 @@
 # Hothey-Engineer
 Do it better make it faster x11 You're my master.
 
-**⚠️ Important Note for Current Release ⚠️**
-This README provides instructions for the current version of Hotkey Engineer.
-A comprehensive overhaul of the installation process, including full `systemd` integration and an automated `setup.py` script, is planned for the next major update. This README will be completely revised at that time.
+**The AutoHotkey Equivalent You've Been Waiting For on Linux**
 
-This README was created with the help of an AI assistant to ensure clarity and provide detailed guidance.
+Are you a former Windows AutoHotkey user looking for a powerful, flexible, and truly extensible automation solution on Linux? Look no further. **HotKey Engineer** is designed to fill that void, offering unparalleled control over your X11 desktop environment. Built with Python, it allows users to create custom actions, run scripts, launch applications, and orchestrate complex workflows with simple keyboard shortcuts. HotKey Engineer offers immense extensibility, enabling you to integrate any Python script as a module, launch applications written in various languages, and even manage system-level tasks with precision.
+
+## Features
+
+  * **Powerful Hotkey Automation:** Define custom keyboard shortcuts to trigger any configured action, from simple commands to complex multi-step workflows.
+  * **Deep Customization:** Unlike other Linux hotkey tools, HotKey Engineer aims to provide the same level of control and flexibility you'd expect from AutoHotkey on Windows.
+  * **Modular & Extensible:** Easily integrate custom Python scripts as modules, transforming existing code or new ideas into powerful automations.
+  * **Seamless System Integration:** Designed for reliable operation as a Systemd user service (via the setup script), ensuring your automations run consistently without manual intervention.
+  * **Lightweight & Efficient:** Python-powered for flexibility without unnecessary resource consumption.
+  * **User-Friendly Configuration:** Intuitive JSON configuration for defining and managing your hotkey actions.
+
+## Compatibility
+
+  * **Developed For:** X11 Desktop Environments (e.g., Cinnamon, GNOME, KDE Plasma, XFCE).
+  * **Tested On:** Linux Mint.
+  * **Other Distributions:** While designed for X11, functionality on other Linux distributions is not guaranteed and may require manual adjustments.
+
+## Getting Started
+
+HotKey Engineer offers two primary ways to run: as a convenient system service managed by a setup script, or manually for direct control.
+
+### Option 1: Install as a System Service (Recommended for Linux Mint Users)
+
+The `setup.sh` script is designed to install HotKey Engineer as a system service, allowing it to run automatically in the background without needing to manually start it after every boot. This setup is specifically configured for Linux Mint.
+
+#### Purpose
+
+This script streamlines the installation by presenting an interactive menu for installation or uninstallation. For installation, it automatically moves HotKey Engineer files from your current directory (e.g., `Downloads` or where you extracted the zip) to a designated system-wide location, configures the main Python script to run automatically as an operating system service (using `systemd`), and starts the service immediately. For uninstallation, it removes these system files and undoes all customizations. The script also provides helpful messages and can update existing HotKey Engineer files.
+
+#### Installation & Uninstallation Steps
+
+1.  **Download HotKey Engineer:**
+    Download the latest `Hotkey-Engineer.zip` file from the file from the GitHub Releases page or Gitlab.
+    *(Replace `YourUsername/hotkey-engineer/releases` with the actual path to your releases page)*
+
+2.  **Extract the Files:**
+    Navigate to your `Downloads` directory (or wherever you saved the zip) and extract the contents. This will create a folder like `Hotkey-Engineer-main` (or similar).
+
+3.  **Navigate to the Extracted Directory:**
+    Open your terminal and go to the directory where you've extracted the files.
+
+    ```bash
+    cd ~/Downloads/Hotkey-Engineer-main/ # Or whatever your extracted folder is named
+    ```
+
+4.  **Customize Your `config.json`:**
+    **Before running the installation script, it is crucial to customize your `config.json` file\!** Open the `config.json` file in your preferred text editor and add or modify your desired hotkey actions and settings. Refer to the "Configuration File Breakdown" section below for details on each field.
+
+5.  **Make the Script Executable:**
+    Before you can run the script, you need to give it permission to execute.
+
+    ```bash
+    chmod +x setup.sh
+    ```
+
+6.  **Run the Setup Script with `sudo`:**
+    Execute the script using `sudo`. This is **required** because the script sets up a system-level `systemd` user service to allow the Python script to run automatically and manages files in system-level directories. While the `setup.sh` script requires `sudo`, the main `Hotkey-Engineer.py` Python script itself does ***not*** run with `sudo` privileges.
+
+    ```bash
+    sudo ./setup.sh
+    ```
+
+7.  **Follow the On-Screen Prompts:**
+    Once executed, the script will present you with an interactive menu in the terminal:
+
+      * To **install**, type `1` and press `Enter`. The script will automatically move the necessary files, set up the `systemd` service, and start the HotKey Engineer service. You don't need to reboot.
+      * To **uninstall**, type `2` and press `Enter`. The script will remove the `systemd` configuration, delete the files from the custom directory, and revert any system customizations.
+
+### Option 2: Run Manually (Without System Service)
+
+If you prefer not to install HotKey Engineer as a system service or are using an operating system other than Linux Mint, you can run the main Python script manually.
+
+1.  **Download HotKey Engineer:**
+    Download the latest `Hotkey-Engineer.zip` file from the GitHub Releases page or Gitlab
+
+2.  **Extract the Files:**
+    Extract the contents of the zip file to a convenient directory of your choice.
+
+3.  **Navigate to the Extracted Directory:**
+    Open your terminal and go to the directory where you've extracted the files.
+
+    ```bash
+    cd /path/to/your/Hotkey-Engineer-folder/ # e.g., cd ~/Documents/Hotkey-Engineer-main/
+    ```
+
+4.  **Customize Your `config.json`:**
+    **Before running the script manually, customize your `config.json` file\!** Open `config.json` in your preferred text editor and define your hotkey actions. Refer to the "Configuration File Breakdown" section below for details.
+
+5.  **Run the Application:**
+    Execute the main Python script directly using Python:
+
+    ```bash
+    python3 Hotkey-Engineer.py
+    ```
+
+      * The application will run as long as the terminal window remains open. To stop it, close the terminal or press `Ctrl+C` in the terminal.
 
 -----
 
-Hotkey Engineer is your personal automation hub for Linux (specifically optimized for **X11** desktop environments like Linux Mint). It's designed to bring the power of customizable hotkeys and script execution to your fingertips, allowing you to run your own Python scripts and external applications with ease.
+**Important Note for Users on File Paths:**
+When specifying the `"path"` for your actions in the `config.json`, please ensure you provide the **exact and correct absolute file path** to your Python script. Your Python modules can reside **anywhere on your Linux system**; they do not need to be within the HotKey Engineer project directory.
 
-If you've ever missed the seamless automation of tools like AutoHotkey on Windows, Hotkey Engineer provides a similar, yet even more powerful, experience by leveraging the full potential of Python. It's built for users who want to create, customize, and manage their desktop automation, turning complex tasks into simple hotkey presses.
+## Configuration File Breakdown
 
-## ✨ Features
-
-  * **Custom Python Script Execution:** Define and run any of your Python scripts (or external applications) using custom hotkeys.
-  * **User-Friendly Configuration:** All automation is managed through a clear and editable JSON configuration file, making it easy to understand and modify your setup.
-  * **Flexible Hotkey Actions:** Configure hotkeys to either `run` a script once or `toggle` its execution (start/stop) for continuous tasks like auto-clickers.
-  * **Integrated Application Launcher:** Beyond Python, easily launch any external application using hotkeys.
-  * **Modular & Extensible:** Hotkey Engineer provides the framework; you provide the Python scripts\! This empowers you to build highly personalized automation workflows.
-  * **Lightweight & Background Operation:** Hotkey Engineer runs as a background process, ready to respond to your commands.
-  * **Linux Mint Optimized (X11):** While potentially adaptable, Hotkey Engineer is built and tested to provide a seamless "just works" experience on Linux Mint and other X11-based desktop environments.
-
-## 🚀 Getting Started (Current Version)
-
-### Prerequisites
-
-  * **Linux Mint (or another X11-based Linux distribution)**
-  * **Python 3.x**
-  * **`pip`** (Python package installer)
-
-**System Dependencies (Install these first\!):**
-
-Before launching Hotkey Engineer, you need to install some core system libraries that it relies on. Open your terminal and run:
-
-```bash
-sudo apt-get update
-sudo apt-get install python3-tk python3-dev scrot xclip xsel
-/usr/bin/python3 -m pip install pynput pyautogui
-```
-
-### Installation & Launch
-
-In this version, installation is simply about extracting the files and launching the main script. An automated `setup.py` will handle this more robustly in a future update.
-
-1.  **Download the latest release:**
-    Download the latest release archive (e.g., `Hotkey-Engineer-vX.Y.Z.zip`) from our official GitHub or GitLab page.
-
-      * **[Download from GitHub](https://github.com/Eniti-Codes/Hothey-Engineer)**
-      * **[Download from GitLab]()**
-
-2.  **Extract the archive:**
-    Locate the downloaded `.zip` file. You can extract it using your file manager or a utility like 7-Zip.
-    For example, open your terminal, navigate to your `Downloads` directory, and extract:
-
-    ```bash
-    cd ~/Downloads
-    # If 7-zip is installed:
-    7z x Hotkey-Engineer-vX.Y.Z.zip
-    # OR using the default unzip utility:
-    unzip Hotkey-Engineer-vX.Y.Z.zip
-    ```
-
-    This will create a folder like `Hotkey-Engineer-vX.Y.Z`.
-
-3.  **Launch Hotkey Engineer:**
-    Navigate into the extracted directory. From here, you will manually launch the main script:
-
-    ```bash
-    cd Hotkey-Engineer-vX.Y.Z
-    python3 main.py # Or whatever your primary entry script is named
-    ```
-
-    Hotkey Engineer will now be running in the background, listening for your hotkeys.
-
-    *Note: For this version, you will need to manually launch Hotkey Engineer each time you want to use it or configure it for automatic startup via your desktop environment's settings. Full `systemd --user` integration for automatic startup will be added in the next update.*
-
-## ⚙️ Configuration
-
-Hotkey Engineer is configured via the `config.json` file located in the directory where you extracted the application files (e.g., `~/Downloads/Hotkey-Engineer-vX.Y.Z/config.json`).
-
-You can open this file with any text editor to add or modify your custom scripts and settings.
-
-### Understanding `config.json`
-
-The `config.json` contains a `scripts` array and `global_settings`. Each object in the `scripts` array represents a script or application you want Hotkey Engineer to manage.
-
-Here's the structure and explanation of each field:
+HotKey Engineer uses a `config.json` file to define your hotkey actions and global settings. Below is a breakdown of the structure and what each field represents.
 
 ```json
-{
-  "scripts": [
     {
-      "name": "My Auto Clicker",                  // Required: A descriptive name for your script.
-      "path": "/home/user/my_scripts/autoclicker.py", // Required: Full path to your Python script or external application executable.
-      "args": ["--mode", "fast"],                 // Optional: A list of command-line arguments to pass to the script/app.
-      "enabled": true,                            // Boolean: Set to 'true' to enable this script, 'false' to disable.
-      "run_on_startup": false,                    // Boolean: If 'true', script runs when Hotkey Engineer starts.
-      "run_hotkey": true,                         // Boolean: If 'true', hotkey triggers this script.
-      "hotkey": ["<ctrl>", "<alt>", "a"],         // Array: List of keys for the hotkey (e.g., ["<ctrl>", "<alt>", "z"]). Modifiers: <ctrl>, <alt>, <shift>, <super> (Windows/Meta key).
-      "hotkey_action": "toggle",                  // String: "toggle" (start/stop) or "run" (execute once).
-      "needs_gui": false,                         // Boolean: If 'true', Hotkey Engineer will try to ensure a graphical session is available before running (important for some UI apps).
-      "is_external_app": false,                   // Boolean: Set to 'true' if 'path' points to a non-Python executable (e.g., `/usr/bin/firefox`). If 'false', Python is assumed.
-      "description": "A simple auto clicker script." // Optional: A brief description of what this script does.
-    },
-    // ... more script definitions
+      "name": "Python script",
+      "path": "/home/username/backup.py",
+      "args": [],
+      "enabled": true,
+      "run_on_startup": false,
+      "run_hotkey": true,
+      "hotkey": ["<ctrl>", "<alt>", "b"],
+      "hotkey_action": "run",
+      "needs_gui": false,
+      "description": "Executes a custom Python script for backups."
+    }
   ],
   "global_settings": {
-    "log_directory": "/home/user/hotkey_engineer_logs" // Optional: Specify a custom directory for Hotkey Engineer's logs. Defaults to ~/.local/share/hotkey-engineer/logs.
+    "log_directory": "/var/log/hotkey-engineer"
   }
 }
 ```
 
-**Hotkey Key Codes:**
+### `actions` Array
 
-  * **Modifiers:** `<ctrl>`, `<alt>`, `<shift>`, `<super>` (the Windows/Meta key).
-  * **Regular Keys:** Most standard keys can be used (e.g., `a`, `b`, `1`, `2`, `f1`, `space`, `enter`, `esc`, `delete`, `tab`, etc.).
-  * **Special Keys:** Consult the `pynput` library documentation for a full list of supported key names if you need less common ones.
+This is an array of objects, where each object represents a distinct hotkey action or automated task.
 
-## ✍️ Creating Your Own Python Scripts
+  * `name` (string):
+      * **Purpose:** A human-readable identifier for your action. This name is primarily used for logging by HotKey Engineer, allowing you to easily identify which module is active or if one malfunctions. You can put any descriptive name here.
+      * **Example:** `"Open Terminal"`, `"Run Bitwarden Unlocker"`, `"Daily System Update"`
+  * `path` (string):
+      * **Purpose:** The absolute path to the **Python script** that this action will run.
+      * **Example:** `"/home/username/scripts/open_calculator.py"`, `"/opt/some_utility/bitwarden_unlock.py"`
+  * `args` (array of strings):
+      * **Purpose:** A list of command-line arguments to pass to the `path` Python script when it runs. Each argument should be a separate string in the array.
+      * **Example:** `["--profile", "default"]`, `["--force", "-v"]`
+  * `enabled` (boolean):
+      * **Purpose:** If `true`, the action is active and can be triggered. If `false`, the action is disabled and will be ignored by HotKey Engineer.
+      * **Example:** `true` (active), `false` (disabled)
+  * `run_on_startup` (boolean):
+      * **Purpose:** If `true`, this action will be executed automatically when HotKey Engineer starts (e.g., upon system boot if configured as a Systemd service).
+      * **Example:** `true` (run on startup), `false` (don't run on startup)
+  * `run_hotkey` (boolean):
+      * **Purpose:** If `true`, this action is enabled to be triggered by the specified `hotkey` combination. If `false`, the `hotkey` field is ignored, and the action can only be triggered on startup (if `run_on_startup` is `true`).
+      * **Example:** `true` (hotkey enabled), `false` (hotkey disabled)
+  * `hotkey` (array of strings):
+      * **Purpose:** Defines the keyboard shortcut that triggers this action. This is an array where each element represents a key in the combination.
+      * **Format:** Use `<mod_key>` for modifier keys (`<ctrl>`, `<alt>`, `<shift>`, `<super>`) and the key itself (e.g., `"x"`, `"f1"`, `"enter"`).
+      * **Example:** `["<ctrl>", "<alt>", "x"]` (Ctrl+Alt+X), `["<super>", "e"]` (Super+E), `["<shift>", "<insert>"]` (Shift+Insert)
+      * *Note: `<super>` typically refers to the Windows key.*
+  * `hotkey_action` (string):
+      * **Purpose:** Specifies how the hotkey should behave.
+      * **Value:** Currently, `"run"` is the primary action, meaning the `path` executable/script will be executed. Future versions may introduce other actions (e.g., `toggle`, `stop`).
+      * **Example:** `"run"`
+  * `needs_gui` (boolean):
+      * **Purpose:** If `true`, indicates that the action requires access to the graphical desktop environment (e.g., to open a browser, display a notification, or simulate keyboard/mouse input). This helps HotKey Engineer manage background processes correctly.
+      * **Example:** `true` (requires GUI), `false` (runs in background without GUI interaction)
+  * `description` (string):
+      * **Purpose:** A brief, optional explanation of what the action does. Useful for documentation and remembering the purpose of complex actions.
+      * **Example:** `"Opens a new Firefox window in incognito mode."`
 
-The real power of Hotkey Engineer lies in your ability to write custom Python scripts\! Here are some common Python libraries you might find useful for your automation needs:
+### `global_settings` Object
 
-  * **`pynput`**: For listening to and controlling keyboard and mouse. Ideal for auto-clickers, complex key sequences, and hotkey listeners within your modules.
-  * **`PyAutoGUI`**: For GUI automation, including moving the mouse, clicking, typing, and taking screenshots. Great for automating interactions with applications that don't have an API.
-  * **`subprocess`**: For running external shell commands or other programs from within your Python script.
-  * **`os` / `shutil`**: For interacting with the file system (creating, deleting, moving files/directories).
-  * **`requests`**: For making HTTP requests, perfect for interacting with web APIs or downloading data.
-  * **`json`**: For working with JSON data, which is useful for configuration or interacting with web services.
+Contains settings that apply to the entire HotKey Engineer instance.
 
-These libraries can be installed into your Hotkey Engineer's Python environment using `pip` (e.g., by navigating to the Hotkey Engineer directory, activating its virtual environment, and running `pip install pynput`).
+  * `log_directory` (string):
+      * **Purpose:** The absolute path to the directory where HotKey Engineer will store its log files. This helps with debugging and monitoring.
+      * **Example:** `"/var/log/hotkey-engineer"`, `"/home/username/.local/share/hotkey-engineer/logs"`
 
-## ⚠️ Important Security Warning for Third-Party Modules
+## Developer Notes on Script Execution
 
-Hotkey Engineer is incredibly powerful because it allows you to run any Python script you provide. However, with great power comes great responsibility, especially concerning scripts obtained from external sources.
+HotKey Engineer's core module execution mechanism is built around **Python scripts**. For developers creating custom modules:
 
-**Please exercise extreme caution when adding modules from third-party or untrusted sources.**
+  * **All Modules Must Be Python Files:** Any script you intend for HotKey Engineer to directly run via its `path` configuration must be a valid Python (`.py`) file.
+  * **Module Location Flexibility:** Your Python modules can be located anywhere on your Linux system. Just ensure the `path` in the `config.json` points to their correct absolute location.
+  * **External Command Execution:** If your module needs to execute commands or applications written in other languages (e.g., Bash scripts, Java applications, compiled C++ programs), your Python module should act as a wrapper. Use Python's `subprocess` module to call and manage these external processes. This allows HotKey Engineer to maintain its Python-centric core while still enabling you to leverage other tools.
 
-  * **Code Execution Risk:** Any Python script you configure Hotkey Engineer to run will execute with your user permissions. A malicious script could potentially harm your system, steal data, or download unwanted software.
-  * **Understanding Imports:** Be aware that powerful Python modules, if imported by a third-party script, can grant it significant control over your system:
-      * **`os` module:** Allows the script to interact with the operating system, including file system operations (creating, deleting, modifying files), changing directories, and running shell commands.
-      * **`subprocess` module:** Enables the script to execute external commands and programs, potentially including system utilities or even `sudo` requests (which would prompt *you* for your password).
-      * **`sys` module:** Provides access to system-specific parameters and functions, including the ability to exit the program or manipulate Python's import path.
-  * **Vetting External Modules:**
-      * **Manual Review:** If possible, always review the source code of any third-party module before running it. Look for suspicious imports or commands.
-      * **Automated Analysis:** Consider running untrusted scripts through AI-powered code analysis tools.
-      * **Isolated Environments:** For maximum safety, test untrusted modules in a disposable virtual environment or a dedicated virtual machine before integrating them into your main Hotkey Engineer setup.
+## Planned Features
 
-Your security is paramount. Hotkey Engineer cannot prevent malicious code from executing if you instruct it to run an untrusted script.
+  * **Dedicated Language Interpreters (Work in Progress):** Future updates will explore integrating a Python-based "interpreter" module that will enable HotKey Engineer to directly run scripts written in other languages (e.g., Bash, JavaScript) as native modules, without requiring a separate Python wrapper script for each. This will further enhance flexibility for developers.
+
+## Stay Updated
+
+Join our Discord server to connect with the community, get support, and stay up-to-date on future iterations of HotKey Engineer and my other development projects\!
+
+**[Join Our Discord Server\!](https://discord.gg/UfyYCRK4jR)**
+
+## Contribution
+
+We welcome contributions to HotKey Engineer\! Please feel free to open issues or submit pull requests.
 
 -----
