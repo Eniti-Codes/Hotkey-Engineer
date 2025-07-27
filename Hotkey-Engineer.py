@@ -17,9 +17,11 @@ running_processes = {}
 automation_config = {}
 script_configs_by_name = {}
 
-# Global file handle for the Module Manager's own log file
 _module_manager_log_file_handle = None
 _is_terminal_attached = False
+
+# --- Constants ---
+MAX_MODULE_LOG_FILES = 10 
 
 # --- Helper Functions ---
 def log_message(level, message, module_name="Module Manager"):
@@ -33,13 +35,11 @@ def log_message(level, message, module_name="Module Manager"):
         else:
             print(timestamped_message, file=sys.stdout)
 
-    # Always write to the log file if it's open
     if _module_manager_log_file_handle:
         try:
             _module_manager_log_file_handle.write(timestamped_message + "\n")
-            _module_manager_log_file_handle.flush() # Ensure it's written immediately
+            _module_manager_log_file_handle.flush()
         except Exception as e:
-            # Fallback print if file logging fails (e.g., disk full, permissions)
             if _is_terminal_attached:
                 print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] [Module Manager] ERROR: Failed to write to log file: {e}", file=sys.stderr)
 
@@ -121,6 +121,40 @@ def terminate_child_module(module_name):
     else:
         log_message("INFO", f"Module '{module_name}' is not currently running.")
 
+def clean_old_logs(log_directory, max_files_to_keep, module_name="Module Manager"):
+    """
+    Deletes oldest log files in a given directory if the count exceeds max_files_to_keep.
+    """
+    log_message("INFO", f"Checking log files in '{log_directory}' for cleanup (max: {max_files_to_keep}).", module_name)
+    try:
+        # Get all .log files with their full paths
+        log_files = []
+        for f_name in os.listdir(log_directory):
+            if f_name.endswith(".log"):
+                f_path = os.path.join(log_directory, f_name)
+                if os.path.isfile(f_path):
+                    log_files.append(f_path)
+
+        # Sort files by modification time (oldest first)
+        log_files.sort(key=os.path.getmtime)
+
+        # Delete older files if count exceeds the limit
+        if len(log_files) > max_files_to_keep:
+            files_to_delete = log_files[:-max_files_to_keep] # All but the last 'max_files_to_keep'
+            log_message("INFO", f"Found {len(log_files)} log files. Deleting {len(files_to_delete)} oldest files from '{log_directory}'.", module_name)
+            for file_path in files_to_delete:
+                try:
+                    os.remove(file_path)
+                    log_message("INFO", f"Deleted old log file: {os.path.basename(file_path)}", module_name)
+                except OSError as e:
+                    log_message("ERROR", f"Error deleting old log file {os.path.basename(file_path)}: {e}", module_name)
+        else:
+            log_message("INFO", f"No old log files to delete in '{log_directory}'. Total files: {len(log_files)}.", module_name)
+
+    except Exception as e:
+        log_message("ERROR", f"An error occurred during log cleanup in '{log_directory}': {e}", module_name)
+
+
 def run_child_module(module_config, global_settings):
     """Executes a single child module."""
     module_name = module_config.get("name", "Unnamed Module")
@@ -140,6 +174,10 @@ def run_child_module(module_config, global_settings):
 
     module_specific_log_dir = os.path.join(log_dir, module_name.lower().replace(" ", "_"))
     os.makedirs(module_specific_log_dir, exist_ok=True)
+
+    # Clean up old logs for this specific module before creating a new one
+    clean_old_logs(module_specific_log_dir, MAX_MODULE_LOG_FILES, module_name)
+
     log_file_path = os.path.join(module_specific_log_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
     if is_external_app:
@@ -296,13 +334,11 @@ def main():
     # Check if a terminal is attached for conditional printing
     _is_terminal_attached = sys.stdout.isatty()
 
-    # Load config dynamically from the same directory as the module
     automation_config = load_config(CONFIG_FILE)
 
     global_settings = automation_config.get("global_settings", {})
     log_dir = global_settings["log_directory"]
 
-    # Ensure log directory exists
     os.makedirs(log_dir, exist_ok=True)
 
     # Open the Module Manager's own log file
@@ -314,7 +350,7 @@ def main():
         # If we can't open the log file, we can only print to terminal if available
         if _is_terminal_attached:
             print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] [Module Manager] ERROR: Could not open Module Manager log file at {module_manager_log_path}: {e}", file=sys.stderr)
-        sys.exit(1) # Critical error, cannot proceed without logging
+        sys.exit(1)
 
     log_message("INFO", "Automation Module Manager (Central Startup & Hotkey Orchestrator) starting...")
     log_message("INFO", f"Global log directory: {log_dir}")

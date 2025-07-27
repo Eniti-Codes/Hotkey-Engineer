@@ -1,25 +1,21 @@
 #!/bin/bash
 
 # --- Configuration for the Hotkey Engineer ---
-# APP_DIR is the base directory for the entire application, including the venv
 APP_DIR="/opt/hotkey_engineer"
-# VENV_DIR is the specific path to the virtual environment within APP_DIR
 VENV_DIR="$APP_DIR/venv"
 
-SERVICE_NAME="hotkey-engineer" # Service name for systemd
+SERVICE_NAME="hotkey-engineer"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 
 MAIN_SCRIPT_NAME="Hotkey-Engineer.py"
 CONFIG_FILE_NAME="config.json"
-MODULES_SUBDIR="modules" # Directory where user's individual Python modules will reside
+MODULES_SUBDIR="modules"
 
-# Paths where the installer expects to find the main script and config file in Downloads
-USER_HOME=$(eval echo "~$SUDO_USER") # Get the actual user's home directory
+USER_HOME=$(eval echo "~$SUDO_USER")
 DOWNLOADS_DIR="$USER_HOME/Downloads"
 MAIN_SCRIPT_SOURCE_PATH="$DOWNLOADS_DIR/$MAIN_SCRIPT_NAME"
 CONFIG_SOURCE_PATH="$DOWNLOADS_DIR/$CONFIG_FILE_NAME"
 
-# List of system-level packages installed by this script
 SYSTEM_DEPENDENCIES="python3-venv python3-tk python3-dev scrot xclip xsel python3-pip"
 
 # --- Function to clean up existing installation components ---
@@ -29,7 +25,6 @@ cleanup_existing_installation() {
     echo "Disabling existing ${SERVICE_NAME} service..."
     sudo systemctl disable "${SERVICE_NAME}.service" 2>/dev/null
 
-    # Only remove the service file, not the application directory itself during cleanup for updates
     if [ -f "$SERVICE_FILE" ]; then
         echo "Removing old systemd service file: $SERVICE_FILE"
         sudo rm "$SERVICE_FILE"
@@ -72,7 +67,6 @@ install_dependencies() {
     fi
 
     echo "Installing/Updating Python packages into virtual environment via pip..."
-    # Install pynput and pyautogui into the virtual environment
     "$VENV_DIR/bin/pip" install --upgrade pynput pyautogui || { echo "ERROR: Failed to install/update Python packages into virtual environment. Aborting."; exit 1; }
     echo "Python packages installed/updated into virtual environment."
 }
@@ -83,7 +77,6 @@ uninstall_dependencies() {
     read -p "This will attempt to remove system packages installed by Hotkey Engineer: ${SYSTEM_DEPENDENCIES}. Continue? (y/N): " confirm_uninstall_deps
     if [[ "$confirm_uninstall_deps" =~ ^[Yy]$ ]]; then
         echo "Uninstalling system dependencies..."
-        # Using purge to remove config files too, and autoremove to clean up packages no longer needed by anything else
         sudo apt-get purge -y $SYSTEM_DEPENDENCIES && sudo apt-get autoremove -y || { echo "WARNING: Failed to uninstall some system dependencies. You may need to remove them manually."; }
         echo "System dependencies uninstallation attempted."
     else
@@ -99,7 +92,6 @@ perform_installation_steps() {
     echo "Ensuring modules directory exists: $APP_DIR/$MODULES_SUBDIR"
     sudo mkdir -p "$APP_DIR/$MODULES_SUBDIR"
 
-    # Move main script and config into the virtual environment's root (overwrites existing)
     echo "Moving ${CONFIG_FILE_NAME} to $VENV_DIR/${CONFIG_FILE_NAME}"
     sudo mv "$CONFIG_SOURCE_PATH" "$VENV_DIR/${CONFIG_FILE_NAME}"
     echo "Moving ${MAIN_SCRIPT_NAME} to $VENV_DIR/${MAIN_SCRIPT_NAME}"
@@ -108,12 +100,9 @@ perform_installation_steps() {
     echo "Making ${MAIN_SCRIPT_NAME} executable within the virtual environment"
     sudo chmod +x "$VENV_DIR/${MAIN_SCRIPT_NAME}"
 
-    # Set ownership for the entire application directory (including venv) to the user
     echo "Setting ownership of $APP_DIR to $SUDO_USER"
     sudo chown -R "$SUDO_USER":"$SUDO_USER" "$APP_DIR"
 
-    # Ensure the log directory (as specified in config.json) is writable by the user
-    # Note: config.json is now inside the VENV_DIR
     LOG_DIR_FROM_CONFIG=$(grep -Po '"log_directory": "\K[^"]*' "$VENV_DIR/$CONFIG_FILE_NAME")
     if [ -z "$LOG_DIR_FROM_CONFIG" ]; then
         echo "WARNING: Could not find 'log_directory' in config.json. Please ensure it's set correctly in $VENV_DIR/$CONFIG_FILE_NAME."
@@ -126,7 +115,6 @@ perform_installation_steps() {
 
 
     echo "Creating systemd service file: $SERVICE_FILE"
-    # Get the XAUTHORITY path for the user who ran sudo
     USER_XAUTHORITY=$(sudo -u "$SUDO_USER" printenv XAUTHORITY)
     if [ -z "$USER_XAUTHORITY" ]; then
         USER_XAUTHORITY="/home/$SUDO_USER/.Xauthority"
@@ -201,16 +189,10 @@ case $choice in
         echo "The Hotkey Engineer service should now be running and will start automatically on future reboots."
         echo ""
         echo "NEXT STEPS:"
-        echo "1. Place your individual Python modules (e.g., welcome_message.py, quick_note.py) into:"
-        echo "   $APP_DIR/$MODULES_SUBDIR/"
-        echo "   Ensure their paths in $VENV_DIR/${CONFIG_FILE_NAME} are absolute and correct (e.g., /opt/hotkey_engineer/modules/my_module.py)."
-        echo "2. Verify the 'log_directory' in $VENV_DIR/${CONFIG_FILE_NAME} is set to a path writable by your user."
-        echo "3. You can check the service status with: sudo systemctl status ${SERVICE_NAME}.service"
-        echo "4. You can view the Hotkey Engineer's logs with: journalctl -u ${SERVICE_NAME}.service -f"
-        echo "5. For detailed Hotkey Engineer logs, check the file: $(grep -Po '"log_directory": "\K[^"]*' "$VENV_DIR/$CONFIG_FILE_NAME")/hotkey_engineer.log"
-        echo "6. For individual module logs, check their respective subdirectories within the global log directory."
-        echo ""
-        echo "IMPORTANT: If hotkeys or GUI modules don't work, verify 'XAUTHORITY' in the service file ($SERVICE_FILE) is correct."
+        echo "1. You can check the service status with: sudo systemctl status ${SERVICE_NAME}.service"
+        echo "2. You can view the Hotkey Engineer's logs with: journalctl -u ${SERVICE_NAME}.service -f"
+        echo "3. For detailed Hotkey Engineer logs, check the file: $(grep -Po '"log_directory": "\K[^"]*' "$VENV_DIR/$CONFIG_FILE_NAME")/hotkey_engineer.log"
+        echo "4. For individual module logs, check their respective subdirectories within the global log directory."
         echo "   Your current XAUTHORITY (from your desktop session) is: $USER_XAUTHORITY"
         echo "   If this path is wrong, edit $SERVICE_FILE and restart the service."
         ;;
