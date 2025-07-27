@@ -308,7 +308,7 @@ def main():
     # Open the Module Manager's own log file
     module_manager_log_path = os.path.join(log_dir, "module_manager.log")
     try:
-        _module_manager_log_file_handle = open(module_manager_log_path, 'a')
+        _module_manager_log_file_handle = open(module_manager_log_path, 'w')
         log_message("INFO", f"Module Manager log file opened at: {module_manager_log_path}")
     except Exception as e:
         # If we can't open the log file, we can only print to terminal if available
