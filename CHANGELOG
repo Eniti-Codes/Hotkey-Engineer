@@ -1,3 +1,6 @@
+July 30
+Updated the config file to be way more consistent. and might have added references?. 
+
 July 28
 Updated the setup script it did not automatically launch Hotkey engineers Python correctly, because it's working with virtual environment, so it was a bit more tricky for me. But finally got it patched. Here you go.
 
