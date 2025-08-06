@@ -185,7 +185,7 @@ HotKey Engineer's core module execution mechanism is built around **Python scrip
 
 ## Planned Features
 
-  * **Dedicated Language Interpreters (Work in Progress):** Future updates will explore integrating a Python-based "interpreter" module that will enable HotKey Engineer to directly run scripts written in other languages (e.g., Bash, JavaScript) as native modules, without requiring a separate Python wrapper script for each. This will further enhance flexibility for developers.
+  * **Dedicated Language Interpreters (On Hold):** Future iteration will explore integrating a Python-based "interpreter" module that will enable HotKey Engineer to directly run scripts written in other languages (e.g., Bash, JavaScript) As a translation layer for Hotkey Engineer due to lack of knowledge on how to bypass virtual environment permission barriers, it is being put on hold. And the solutions that I came up with only work on very very Pacific hardware Thanks for your understanding.
 
 ## Stay Updated
 
