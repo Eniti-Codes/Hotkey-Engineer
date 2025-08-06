@@ -140,7 +140,7 @@ def clean_old_logs(log_directory, max_files_to_keep, module_name="Module Manager
 
         # Delete older files if count exceeds the limit
         if len(log_files) > max_files_to_keep:
-            files_to_delete = log_files[:-max_files_to_keep] # All but the last 'max_files_to_keep'
+            files_to_delete = log_files[:-max_files_to_keep]
             log_message("INFO", f"Found {len(log_files)} log files. Deleting {len(files_to_delete)} oldest files from '{log_directory}'.", module_name)
             for file_path in files_to_delete:
                 try:
@@ -162,7 +162,6 @@ def run_child_module(module_config, global_settings):
     module_args = module_config.get("args", [])
     module_env = module_config.get("environment", {})
     needs_gui = module_config.get("needs_gui", False)
-    is_external_app = module_config.get("is_external_app", False)
 
     log_dir = global_settings.get("log_directory")
 
