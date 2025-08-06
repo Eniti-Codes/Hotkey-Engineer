@@ -12,7 +12,6 @@ from functools import partial
 MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(MODULE_DIR, "config.json")
 
-# --- Global State ---
 running_processes = {}
 automation_config = {}
 script_configs_by_name = {}
@@ -127,7 +126,6 @@ def clean_old_logs(log_directory, max_files_to_keep, module_name="Module Manager
     """
     log_message("INFO", f"Checking log files in '{log_directory}' for cleanup (max: {max_files_to_keep}).", module_name)
     try:
-        # Get all .log files with their full paths
         log_files = []
         for f_name in os.listdir(log_directory):
             if f_name.endswith(".log"):
@@ -140,7 +138,7 @@ def clean_old_logs(log_directory, max_files_to_keep, module_name="Module Manager
 
         # Delete older files if count exceeds the limit
         if len(log_files) > max_files_to_keep:
-            files_to_delete = log_files[:-max_files_to_keep]
+            files_to_delete = log_files[:-max_files_to_keep] # All but the last 'max_files_to_keep'
             log_message("INFO", f"Found {len(log_files)} log files. Deleting {len(files_to_delete)} oldest files from '{log_directory}'.", module_name)
             for file_path in files_to_delete:
                 try:
@@ -330,7 +328,6 @@ def main():
     """Main function to orchestrate module execution and listen for hotkeys."""
     global automation_config, script_configs_by_name, _module_manager_log_file_handle, _is_terminal_attached
 
-    # Check if a terminal is attached for conditional printing
     _is_terminal_attached = sys.stdout.isatty()
 
     automation_config = load_config(CONFIG_FILE)
@@ -340,13 +337,11 @@ def main():
 
     os.makedirs(log_dir, exist_ok=True)
 
-    # Open the Module Manager's own log file
     module_manager_log_path = os.path.join(log_dir, "module_manager.log")
     try:
         _module_manager_log_file_handle = open(module_manager_log_path, 'w')
         log_message("INFO", f"Module Manager log file opened at: {module_manager_log_path}")
     except Exception as e:
-        # If we can't open the log file, we can only print to terminal if available
         if _is_terminal_attached:
             print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] [Module Manager] ERROR: Could not open Module Manager log file at {module_manager_log_path}: {e}", file=sys.stderr)
         sys.exit(1)
@@ -356,7 +351,6 @@ def main():
 
     script_configs_by_name = {s['name']: s for s in automation_config.get("scripts", [])}
 
-    # Launch 'run_on_startup' modules
     startup_modules_to_launch = [
         s for s in automation_config.get("scripts", [])
         if s.get("enabled", False) and s.get("run_on_startup", False)
@@ -413,7 +407,6 @@ def main():
     except Exception as e:
         log_message("ERROR", f"Module Manager encountered an unexpected error in main loop: {e}")
     finally:
-        # Clean up on exit
         log_message("INFO", "Automation Module Manager shutting down. Terminating any active child processes.")
         for module_name in list(running_processes.keys()):
             terminate_child_module(module_name)
