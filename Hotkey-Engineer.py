@@ -20,7 +20,7 @@ _module_manager_log_file_handle = None
 _is_terminal_attached = False
 
 # --- Constants ---
-MAX_MODULE_LOG_FILES = 10 
+MAX_MODULE_LOG_FILES = 10
 
 # --- Helper Functions ---
 def log_message(level, message, module_name="Module Manager"):
@@ -177,10 +177,7 @@ def run_child_module(module_config, global_settings):
 
     log_file_path = os.path.join(module_specific_log_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
-    if is_external_app:
-        command = [module_path] + module_args
-    else:
-        command = [sys.executable, module_path] + module_args
+    command = [sys.executable, module_path] + module_args
 
     env = os.environ.copy()
     env.update(module_env)
@@ -222,9 +219,8 @@ def hotkey_action_callback(module_name, action_type, global_settings):
         return
 
     if action_type == "run":
-        if module_config.get("is_external_app", False) and \
-           module_name in running_processes and running_processes[module_name].poll() is None:
-            log_message("INFO", f"External app '{module_name}' is already running. Not launching a new instance.")
+        if module_name in running_processes and running_processes[module_name].poll() is None:
+            log_message("INFO", f"Module '{module_name}' is already running. Not launching a new instance.")
         else:
             if module_name in running_processes and running_processes[module_name].poll() is not None:
                 log_message("INFO", f"Cleaning up stale process entry for '{module_name}'.")
@@ -304,7 +300,7 @@ def setup_hotkeys(global_settings):
             log_message("INFO", f"Registered hotkey: {hotkey_keys} for module '{module_name}' (action: {hotkey_action})")
         except Exception as e:
             log_message("ERROR", f"Failed to register hotkey {hotkey_keys} for module '{module_name}': {e}")
-            log_message("ERROR", f"Common issues: Missing Xorg dependencies, Wayland session, or incorrect key string format for pynput.")
+            log_message("ERROR", "Common issues: Missing Xorg dependencies, Wayland session, or incorrect key string format for pynput.")
 
 
     if hotkey_objects:

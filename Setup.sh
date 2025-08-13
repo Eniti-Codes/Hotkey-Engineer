@@ -1,17 +1,17 @@
 #!/bin/bash
 
 # --- Configuration for the Hotkey Engineer ---
-APP_DIR="/opt/hotkey_engineer"
+APP_DIR="$HOME/.local/share/hotkey_engineer"
 VENV_DIR="$APP_DIR/venv"
 
 SERVICE_NAME="hotkey-engineer"
-SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+# The service file is now a user service file
+SERVICE_FILE="$HOME/.config/systemd/user/${SERVICE_NAME}.service"
 
 MAIN_SCRIPT_NAME="Hotkey-Engineer.py"
 CONFIG_FILE_NAME="config.json"
 
-USER_HOME=$(eval echo "~$SUDO_USER")
-DOWNLOADS_DIR="$USER_HOME/Downloads"
+DOWNLOADS_DIR="$HOME/Downloads"
 MAIN_SCRIPT_SOURCE_PATH="$DOWNLOADS_DIR/$MAIN_SCRIPT_NAME"
 CONFIG_SOURCE_PATH="$DOWNLOADS_DIR/$CONFIG_FILE_NAME"
 
@@ -19,22 +19,16 @@ SYSTEM_DEPENDENCIES="python3-venv python3-tk python3-dev scrot xclip xsel python
 
 # --- Function to clean up existing installation components ---
 cleanup_existing_installation() {
-    echo "Stopping existing ${SERVICE_NAME} service..."
-    sudo systemctl stop "${SERVICE_NAME}.service" 2>/dev/null
-    echo "Disabling existing ${SERVICE_NAME} service..."
-    sudo systemctl disable "${SERVICE_NAME}.service" 2>/dev/null
+    echo "Stopping existing ${SERVICE_NAME} user service..."
+    systemctl --user stop "${SERVICE_NAME}.service" 2>/dev/null
+    echo "Disabling existing ${SERVICE_NAME} user service..."
+    systemctl --user disable "${SERVICE_NAME}.service" 2>/dev/null
 
     if [ -f "$SERVICE_FILE" ]; then
-        echo "Removing old systemd service file: $SERVICE_FILE"
-        sudo rm "$SERVICE_FILE"
+        echo "Removing old user service file: $SERVICE_FILE"
+        rm "$SERVICE_FILE"
     fi
-    ENV_FILE="/etc/default/${SERVICE_NAME}"
-    if [ -f "$ENV_FILE" ]; then
-        echo "Removing old service environment file: $ENV_FILE"
-        sudo rm "$ENV_FILE"
-    fi
-    sudo systemctl daemon-reload 2>/dev/null
-    echo "Existing service components cleaned up."
+    echo "Existing user service components cleaned up."
 }
 
 # --- Function to check for required files in Downloads folder ---
@@ -42,13 +36,7 @@ check_download_files() {
     echo "Checking for '${CONFIG_FILE_NAME}' and '${MAIN_SCRIPT_NAME}' in your Downloads folder..."
     if [ ! -f "$CONFIG_SOURCE_PATH" ] || [ ! -f "$MAIN_SCRIPT_SOURCE_PATH" ]; then
         echo "--- IMPORTANT: Files Not Found! ---"
-        echo "It looks like '${CONFIG_FILE_NAME}' or '${MAIN_SCRIPT_NAME}' are not in your Downloads folder:"
-        echo "Expected location for ${CONFIG_FILE_NAME}: $CONFIG_SOURCE_PATH"
-        echo "Expected location for ${MAIN_SCRIPT_NAME}: $MAIN_SCRIPT_SOURCE_PATH"
-        echo ""
-        echo "Please ensure both files are in your Downloads folder: $DOWNLOADS_DIR"
-        echo "Once moved, please run this script again."
-        echo ""
+        echo "Please ensure both '${CONFIG_FILE_NAME}' and '${MAIN_SCRIPT_NAME}' are in your Downloads folder: $DOWNLOADS_DIR"
         return 1
     fi
     echo "Both files found in Downloads folder."
@@ -57,7 +45,7 @@ check_download_files() {
 
 # --- Function to install system-level and Python dependencies ---
 install_dependencies() {
-    echo "Installing system-level dependencies (may require your sudo password)..."
+    echo "Installing system-level dependencies (requires your sudo password)..."
     sudo apt-get update
     sudo apt-get install -y $SYSTEM_DEPENDENCIES || { echo "ERROR: Failed to install system dependencies. Aborting."; exit 1; }
     echo "System dependencies installed."
@@ -71,109 +59,71 @@ install_dependencies() {
     fi
 
     echo "Installing/Updating Python packages into virtual environment via pip..."
-    "$VENV_DIR/bin/pip" install --upgrade pynput pyautogui || { echo "ERROR: Failed to install/update Python packages into virtual environment. Aborting."; exit 1; }
+    "$VENV_DIR/bin/pip" install --upgrade pynput pyautogui || { echo "ERROR: Failed to install/update Python packages. Aborting."; exit 1; }
     echo "Python packages installed/updated into virtual environment."
-}
-
-# --- Function to uninstall system-level dependencies ---
-uninstall_dependencies() {
-    echo "--- Uninstall System Dependencies ---"
-    read -p "This will attempt to remove system packages installed by Hotkey Engineer: ${SYSTEM_DEPENDENCIES}. Continue? (y/N): " confirm_uninstall_deps
-    if [[ "$confirm_uninstall_deps" =~ ^[Yy]$ ]]; then
-        echo "Uninstalling system dependencies..."
-        sudo apt-get purge -y $SYSTEM_DEPENDENCIES && sudo apt-get autoremove -y || { echo "WARNING: Failed to uninstall some system dependencies. You may need to remove them manually."; }
-    else
-        echo "Skipping system dependency uninstallation."
-    fi
 }
 
 # --- Function to perform core installation/update steps ---
 perform_installation_steps() {
     echo "Ensuring application directory exists: $APP_DIR"
-    sudo mkdir -p "$APP_DIR"
+    mkdir -p "$APP_DIR"
 
-    echo "Moving ${CONFIG_FILE_NAME} to $VENV_DIR/${CONFIG_FILE_NAME}"
-    sudo mv "$CONFIG_SOURCE_PATH" "$VENV_DIR/${CONFIG_FILE_NAME}"
-    echo "Moving ${MAIN_SCRIPT_NAME} to $VENV_DIR/${MAIN_SCRIPT_NAME}"
-    sudo mv "$MAIN_SCRIPT_SOURCE_PATH" "$VENV_DIR/${MAIN_SCRIPT_NAME}"
+    echo "Moving ${CONFIG_FILE_NAME} to $APP_DIR/"
+    mv "$CONFIG_SOURCE_PATH" "$APP_DIR/"
+    echo "Moving ${MAIN_SCRIPT_NAME} to $APP_DIR/"
+    mv "$MAIN_SCRIPT_SOURCE_PATH" "$APP_DIR/"
 
-    echo "Making ${MAIN_SCRIPT_NAME} executable within the virtual environment"
-    sudo chmod +x "$VENV_DIR/${MAIN_SCRIPT_NAME}"
+    echo "Making ${MAIN_SCRIPT_NAME} executable within the application directory"
+    chmod +x "$APP_DIR/${MAIN_SCRIPT_NAME}"
 
-    echo "Setting ownership of $APP_DIR to $SUDO_USER"
-    sudo chown -R "$SUDO_USER":"$SUDO_USER" "$APP_DIR"
-
-    LOG_DIR_FROM_CONFIG=$(grep -Po '"log_directory": "\K[^"]*' "$VENV_DIR/$CONFIG_FILE_NAME")
+    LOG_DIR_FROM_CONFIG=$(grep -Po '"log_directory": "\K[^"]*' "$APP_DIR/$CONFIG_FILE_NAME")
     if [ -z "$LOG_DIR_FROM_CONFIG" ]; then
-        echo "WARNING: Could not find 'log_directory' in config.json. Please ensure it's set correctly in $VENV_DIR/$CONFIG_FILE_NAME."
-        echo "Defaulting to /var/log/${SERVICE_NAME}_logs for permissions setup."
-        LOG_DIR_FROM_CONFIG="/var/log/${SERVICE_NAME}_logs"
+        echo "WARNING: Could not find 'log_directory' in config.json. Defaulting to a safe user-specific path."
+        LOG_DIR_FROM_CONFIG="$APP_DIR/logs"
     fi
-    echo "Ensuring log directory '$LOG_DIR_FROM_CONFIG' is writable by $SUDO_USER"
-    sudo mkdir -p "$LOG_DIR_FROM_CONFIG"
-    sudo chown -R "$SUDO_USER":"$SUDO_USER" "$LOG_DIR_FROM_CONFIG"
+    echo "Ensuring log directory '$LOG_DIR_FROM_CONFIG' is writable by the user"
+    mkdir -p "$LOG_DIR_FROM_CONFIG"
 
-    echo "Creating systemd service file: $SERVICE_FILE"
+    echo "Creating systemd user service file: $SERVICE_FILE"
+    mkdir -p "$(dirname "$SERVICE_FILE")"
 
-    USER_XAUTHORITY_PATH=""
-    if [ -n "$SUDO_USER" ]; then
-        USER_XAUTHORITY_PATH=$(sudo -u "$SUDO_USER" printenv XAUTHORITY 2>/dev/null)
-
-        if [ -z "$USER_XAUTHORITY_PATH" ] || [ ! -f "$USER_XAUTHORITY_PATH" ]; then
-            if [ -f "/home/$SUDO_USER/.Xauthority" ]; then
-                USER_XAUTHORITY_PATH="/home/$SUDO_USER/.Xauthority"
-            else
-                echo "WARNING: Could not determine user's XAUTHORITY path. Hotkey/GUI modules may fail to interact with the display."
-                echo "You may need to manually set the correct XAUTHORITY in the service environment file."
-            fi
-        fi
-    fi
-
-    ENV_FILE="/etc/default/${SERVICE_NAME}"
-    echo "Creating environment file for service: $ENV_FILE"
-    sudo bash -c "cat > \"$ENV_FILE\" <<EOL
-DISPLAY=:0
-XAUTHORITY=${USER_XAUTHORITY_PATH}
-EOL"
-
-    sudo bash -c "cat > \"$SERVICE_FILE\" <<EOL
+    cat > "$SERVICE_FILE" <<EOL
 [Unit]
 Description=Hotkey Engineer: Central Automation Module Manager
 After=network.target graphical-session.target
 
 [Service]
-ExecStart=$VENV_DIR/bin/python3 $VENV_DIR/${MAIN_SCRIPT_NAME}
-WorkingDirectory=$VENV_DIR
-EnvironmentFile=-${ENV_FILE}
+ExecStart=$VENV_DIR/bin/python3 $APP_DIR/${MAIN_SCRIPT_NAME}
+WorkingDirectory=$APP_DIR
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
 StandardError=journal
 Type=simple
 
-User=$SUDO_USER
-Group=$SUDO_USER
-
-Delegate=yes
-
 [Install]
-WantedBy=graphical.target
-EOL"
+WantedBy=graphical-session.target
+EOL
 
-    echo "Reloading systemd daemon to recognize changes..."
-    sudo systemctl daemon-reload
+    echo "Reloading systemd user daemon to recognize changes..."
+    systemctl --user daemon-reload
 
     echo "Enabling ${SERVICE_NAME}.service to start on boot..."
-    sudo systemctl enable "${SERVICE_NAME}.service"
+    systemctl --user enable "${SERVICE_NAME}.service"
 
     echo "Starting ${SERVICE_NAME}.service now..."
-    sudo systemctl start "${SERVICE_NAME}.service"
+    systemctl --user start "${SERVICE_NAME}.service"
 }
 
-# --- Main Menu Presentation and Action Execution ---
+# --- Main Script Logic ---
+if [ "$EUID" -eq 0 ]; then
+    echo "ERROR: Please run this script as a normal user, not with sudo."
+    echo "The script will ask for your sudo password when needed."
+    exit 1
+fi
 
 echo "--- Hotkey Engineer Setup & Management ---"
-echo "This script will install or update the Hotkey Engineer as a systemd service."
+echo "This script will install or update the Hotkey Engineer as a systemd user service."
 echo "It requires 'Hotkey-Engineer.py' and 'config.json' to be in your Downloads folder."
 echo ""
 echo "Please choose an option:"
@@ -184,72 +134,34 @@ read -p "Enter your choice (1, 2, or 3): " choice
 
 case $choice in
     1)
-    # Install / Update Logic
         echo "You chose: Install / Update Hotkey Engineer."
         echo "Proceeding with installation/update..."
-
-        if [ "$EUID" -ne 0 ]; then
-            echo "Please run this script with sudo: sudo ./setup.sh"
-            exit 1
-        fi
-
         if ! check_download_files; then
             exit 1
         fi
-
-        cleanup_existing_installation
-
         install_dependencies
-
         perform_installation_steps
         echo "--- Installation/Update Complete! ---"
-        echo "The Hotkey Engineer service should now be running and will start automatically on future reboots."
-        echo ""
-        echo "NEXT STEPS:"
-        echo "1. You can check the service status with: sudo systemctl status ${SERVICE_NAME}.service"
-        echo "2. You can view the Hotkey Engineer's logs with: journalctl -u ${SERVICE_NAME}.service -f"
-        echo "3. For detailed Hotkey Engineer logs, check the file: $(grep -Po '"log_directory": "\K[^"]*' "$VENV_DIR/$CONFIG_FILE_NAME" 2>/dev/null || echo "/var/log/${SERVICE_NAME}_logs")/hotkey_engineer.log"
-        echo "4. Your current XAUTHORITY (from your desktop session) has been used to configure the service."
-        echo "   If hotkeys/GUI modules fail, check the service environment file: /etc/default/${SERVICE_NAME} and the service file: $SERVICE_FILE"
+        echo "The Hotkey Engineer service should now be running."
+        echo "You can check the service status with: systemctl --user status ${SERVICE_NAME}.service"
+        echo "You can view the logs with: journalctl --user -u ${SERVICE_NAME}.service -f"
         ;;
-
     2)
-    # Uninstall Logic (Application Files and Service Only)
         echo "You chose: Uninstall Hotkey Engineer."
         echo "Proceeding with uninstallation of application files and service..."
-
-        if [ "$EUID" -ne 0 ]; then
-            echo "Please run this script with sudo: sudo ./setup.sh"
-            exit 1
-        fi
-
         cleanup_existing_installation
         if [ -d "$APP_DIR" ]; then
-            echo "Removing application directory: $APP_DIR (includes virtual environment)"
-            sudo rm -rf "$APP_DIR"
+            echo "Removing application directory: $APP_DIR"
+            rm -rf "$APP_DIR"
         fi
         echo "--- Application Uninstallation Complete! ---"
-        echo "Hotkey Engineer application files and service have been removed."
-        echo "It will no longer start automatically on boot."
-        echo "Note: Log files in $(grep -Po '"log_directory": "\K[^"]*' "$VENV_DIR/$CONFIG_FILE_NAME" 2>/dev/null || echo "/var/log/${SERVICE_NAME}_logs") were NOT removed."
-        echo "System dependencies (e.g., python3-tk, scrot) were NOT removed. Run option 3 to remove them."
         ;;
-
     3)
-    # Uninstall System Dependencies Logic
         echo "You chose: Uninstall System Dependencies."
-
-        if [ "$EUID" -ne 0 ]; then
-            echo "Please run this script with sudo: sudo ./setup.sh"
-            exit 1
-        fi
-
         uninstall_dependencies
         echo "--- System Dependency Uninstallation Attempted ---"
         ;;
-
     *)
-    # Invalid choice
         echo "Invalid choice. Please enter 1, 2, or 3."
         exit 1
         ;;
