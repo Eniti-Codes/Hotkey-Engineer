@@ -19,6 +19,7 @@ Are you a former Windows AutoHotkey user looking for a powerful, flexible, and t
   * **Developed For:** X11 Desktop Environments (e.g., Cinnamon, GNOME, KDE Plasma, XFCE).
   * **Tested On:** Linux Mint.
   * **Other Distributions:** While designed for X11, functionality on other Linux distributions is not guaranteed and may require manual adjustments.
+  * **Xwayland Support:** The application is built to be compatible with Wayland through the Xwayland compatibility layer, and this is the intended path for official support. However, this functionality is currently untested. We encourage users to test it and report their experience on GitHub to help us improve.
 
 ## Getting Started
 
