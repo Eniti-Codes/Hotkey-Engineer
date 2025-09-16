@@ -90,7 +90,8 @@ perform_installation_steps() {
     cat > "$SERVICE_FILE" <<EOL
 [Unit]
 Description=Hotkey Engineer: Central Automation Module Manager
-After=network.target graphical-session.target
+After=network.target graphical-session.target dbus.service
+Wants=graphical-session.target dbus.service
 
 [Service]
 ExecStart=$VENV_DIR/bin/python3 $APP_DIR/${MAIN_SCRIPT_NAME}
