@@ -1,3 +1,6 @@
+September 16
+Issue in previous versions was a race condition during system startup-a classic failure of dependency ordering. The service would often start before the necessary user-level desktop session components, like the D-Bus service, were fully initialized. This led to errors and required users to resort to insecure, root-based workarounds. This update resolves that issue permanently by correctly setting the SystemD unit file dependencies (After=dbus. service graphical- session. target ). This ensures the service launches only when the required D-Bus session is active, eliminating the race condition and guaranteeing a stable start.
+
 August 12
 > Setup Script Overhaul: The setup process has been completely rewritten to improve security and compatibility. hotkey-engineer is now installed as a systemd --user service, which is the modern and secure standard for user-specific applications.
 > Wayland Compatibility (via Xwayland): This update ensures the application works reliably on both X11 and Wayland display servers by leveraging the Xwayland compatibility layer. This correctly handles environment variables, allowing the application to function seamlessly without native Wayland support.
