@@ -106,6 +106,29 @@ If you prefer not to install HotKey Engineer as a system service or are using an
 **Important Note for Users on File Paths:**
 When specifying the `"path"` for your actions in the `config.json`, please ensure you provide the **exact and correct absolute file path** to your Python script. Your Python modules can reside **anywhere on your Linux system**; they do not need to be within the HotKey Engineer project directory.
 
+
+## Enabling the Config-Editor GUI (One-Time Step)
+
+The Config-Editor UI is ready to run, but requires one final, quick manual step to activate its hotkey. Once done, you'll never need to manually edit the config again!
+
+    Locate Config-Editor.py: After running the service installation script, the files are located in your user-specific application directory.
+
+        File Path: ~/.local/share/hotkey_engineer/Config-Editor.py
+
+    Edit config.json: Open your main configuration file in the same directory: ~/.local/share/hotkey_engineer/config.json.
+
+    Add the Action: At the very bottom of the main actions array, add a new action object using the full path to Config-Editor.py. The action name must be Config Editor for proper recognition.
+
+    Save and Restart: Save the config.json file. You must restart your system (or the Systemd service) for the new action to take effect.
+
+Once restarted, press Ctrl + Alt + ] to open the Config-Editor UI and manage all future hotkeys and settings visually!
+
+Due to the way the current Bash setup script handles file management, the user's customized configuration is not preserved during updates.
+
+If you choose to update or reinstall Hotkey Engineer using the Setup.sh script, you will have to repeat these four steps to re-enable the Config-Editor hotkey in your new config.json file. This is a current limitation of the beta installation method.
+
+
+
 ## Configuration File Breakdown
 
 HotKey Engineer uses a `config.json` file to define your hotkey actions and global settings. Below is a breakdown of the structure and what each field represents.
