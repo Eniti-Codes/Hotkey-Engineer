@@ -22,15 +22,16 @@ APP_DIR="$HOME/.local/share/hotkey_engineer"
 VENV_DIR="$APP_DIR/venv"
 
 SERVICE_NAME="hotkey-engineer"
-# The service file is now a user service file
 SERVICE_FILE="$HOME/.config/systemd/user/${SERVICE_NAME}.service"
 
 MAIN_SCRIPT_NAME="Hotkey-Engineer.py"
 CONFIG_FILE_NAME="config.json"
+UI_SCRIPT_NAME="Config-Editor.py"
 
 DOWNLOADS_DIR="$HOME/Downloads"
 MAIN_SCRIPT_SOURCE_PATH="$DOWNLOADS_DIR/$MAIN_SCRIPT_NAME"
 CONFIG_SOURCE_PATH="$DOWNLOADS_DIR/$CONFIG_FILE_NAME"
+UI_SCRIPT_SOURCE_PATH="$DOWNLOADS_DIR/$UI_SCRIPT_NAME"
 
 SYSTEM_DEPENDENCIES="python3-venv python3-tk python3-dev scrot xclip xsel python3-pip"
 
@@ -50,13 +51,13 @@ cleanup_existing_installation() {
 
 # --- Function to check for required files in Downloads folder ---
 check_download_files() {
-    echo "Checking for '${CONFIG_FILE_NAME}' and '${MAIN_SCRIPT_NAME}' in your Downloads folder..."
-    if [ ! -f "$CONFIG_SOURCE_PATH" ] || [ ! -f "$MAIN_SCRIPT_SOURCE_PATH" ]; then
+    echo "Checking for '${CONFIG_FILE_NAME}', '${MAIN_SCRIPT_NAME}', and '${UI_SCRIPT_NAME}' in your Downloads folder..."
+    if [ ! -f "$CONFIG_SOURCE_PATH" ] || [ ! -f "$MAIN_SCRIPT_SOURCE_PATH" ] || [ ! -f "$UI_SCRIPT_SOURCE_PATH" ]; then
         echo "--- IMPORTANT: Files Not Found! ---"
-        echo "Please ensure both '${CONFIG_FILE_NAME}' and '${MAIN_SCRIPT_NAME}' are in your Downloads folder: $DOWNLOADS_DIR"
+        echo "Please ensure '${CONFIG_FILE_NAME}', '${MAIN_SCRIPT_NAME}', and '${UI_SCRIPT_NAME}' are in your Downloads folder: $DOWNLOADS_DIR"
         return 1
     fi
-    echo "Both files found in Downloads folder."
+    echo "All required files found in Downloads folder."
     return 0
 }
 
@@ -89,9 +90,15 @@ perform_installation_steps() {
     mv "$CONFIG_SOURCE_PATH" "$APP_DIR/"
     echo "Moving ${MAIN_SCRIPT_NAME} to $APP_DIR/"
     mv "$MAIN_SCRIPT_SOURCE_PATH" "$APP_DIR/"
+    
+    echo "Moving ${UI_SCRIPT_NAME} to $APP_DIR/"
+    mv "$UI_SCRIPT_SOURCE_PATH" "$APP_DIR/"
 
     echo "Making ${MAIN_SCRIPT_NAME} executable within the application directory"
     chmod +x "$APP_DIR/${MAIN_SCRIPT_NAME}"
+    
+    echo "Making ${UI_SCRIPT_NAME} executable within the application directory"
+    chmod +x "$APP_DIR/${UI_SCRIPT_NAME}"
 
     LOG_DIR_FROM_CONFIG=$(grep -Po '"log_directory": "\K[^"]*' "$APP_DIR/$CONFIG_FILE_NAME")
     if [ -z "$LOG_DIR_FROM_CONFIG" ]; then
