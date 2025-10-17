@@ -209,6 +209,10 @@ HotKey Engineer's core module execution mechanism is built around **Python scrip
 
 ## Planned Features
 
+  * **Simplified Installation:** The final release will be distributed as a double-clickable .deb package, providing a seamless, one-click installation experience for Linux Mint users.
+    
+  * **Future-Proofing:** We'll ensure the tool is compatible with xWayland to support both current and future Linux display environments.
+
   * **Dedicated Language Interpreters (On Hold):** Future iteration will explore integrating a Python-based "interpreter" module that will enable HotKey Engineer to directly run scripts written in other languages (e.g., Bash, JavaScript) As a translation layer for Hotkey Engineer due to lack of knowledge on how to bypass virtual environment permission barriers, it is being put on hold. And the solutions that I came up with only work on very very Pacific hardware Thanks for your understanding.
 
 ## Stay Updated
