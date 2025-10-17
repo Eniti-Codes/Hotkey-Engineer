@@ -1,3 +1,7 @@
+October 17
+Config-Editor GUI Introduction (Major Feature): Implemented a dedicated Graphical User Interface, Config-Editor.py, intended for post-installation configuration management. This UI is designed to bypass the necessity of manual JSON file editing.
+Decoupled Configuration Workflow: Introduced a new operational model where ongoing configuration changes are handled by the Config-Editor UI and saved to the user's local config.json. This abstracts the user from the underlying file structure for all changes following initial deployment.
+
 September 16
 Issue in previous versions was a race condition during system startup-a classic failure of dependency ordering. The service would often start before the necessary user-level desktop session components, like the D-Bus service, were fully initialized. This led to errors and required users to resort to insecure, root-based workarounds. This update resolves that issue permanently by correctly setting the SystemD unit file dependencies (After=dbus. service graphical- session. target ). This ensures the service launches only when the required D-Bus session is active, eliminating the race condition and guaranteeing a stable start.
 
