@@ -1,7 +1,7 @@
 {
   "scripts": [
     {
-      "name": "1",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -13,7 +13,7 @@
       "description": ""
     },
     {
-      "name": "2",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -25,7 +25,7 @@
       "description": ""
     },
     {
-      "name": "3",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -37,7 +37,7 @@
       "description": ""
     },
     {
-      "name": "4",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -49,7 +49,7 @@
       "description": ""
     },
     {
-      "name": "5",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -61,7 +61,7 @@
       "description": ""
     },
     {
-      "name": "6",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -73,7 +73,7 @@
       "description": ""
     },
     {
-      "name": "7",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -85,7 +85,7 @@
       "description": ""
     },
     {
-      "name": "8",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -97,7 +97,7 @@
       "description": ""
     },
     {
-      "name": "9",
+      "name": "",
       "path": "",
       "args": [],
       "enabled": false,
@@ -109,16 +109,16 @@
       "description": ""
     },
     {
-      "name": "10",
+      "name": "Config Editor",
       "path": "",
       "args": [],
-      "enabled": false,
+      "enabled": true,
       "run_on_startup": false,
-      "run_hotkey": false,
-      "hotkey": ["<ctrl>", "<alt>", "x"],
-      "hotkey_action": "toggle",
-      "needs_gui": false,
-      "description": ""
+      "run_hotkey": true,
+      "hotkey": ["<ctrl>", "<alt>", "]"],
+      "hotkey_action": "run",
+      "needs_gui": true,
+      "description": "The UI Config Editor! x"
     }
   ],
   "global_settings": {
