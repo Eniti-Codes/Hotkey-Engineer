@@ -1,3 +1,15 @@
+October 22
+Core Application Updates
+Relative Path Definition: Users can now use the ~/example syntax to define relative paths for code execution, making configuration more flexible.
+
+Post-Installation UI Fix: Resolved a critical issue where the User Interface (UI) was not functioning immediately after installation. The UI should now be fully operational upon the first launch.
+
+Setup & Installation Improvements
+Simplified File Handling: The setup script has been refactored to eliminate the requirement of placing installation files in the downloads directory. The script now automatically copies and replaces the necessary files where they're needed.
+
+Systemd Service Reliability: Fixed an issue in the setup script that prevented the proper termination and replacement of the existing systemd service during an update, ensuring seamless updates and service restarts.
+
+
 October 17
 Config-Editor GUI Introduction (Major Feature): Implemented a dedicated Graphical User Interface, Config-Editor.py, intended for post-installation configuration management. This UI is designed to bypass the necessity of manual JSON file editing.
 Decoupled Configuration Workflow: Introduced a new operational model where ongoing configuration changes are handled by the Config-Editor UI and saved to the user's local config.json. This abstracts the user from the underlying file structure for all changes following initial deployment.
