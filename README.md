@@ -1,4 +1,4 @@
-# Hothey-Engineer
+# Hotkey-Engineer
 Do it better make it faster x11 You're my master.
 
 **The AutoHotkey Equivalent You've Been Waiting For on Linux**
