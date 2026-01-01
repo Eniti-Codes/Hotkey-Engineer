@@ -1,5 +1,16 @@
 # Hotkey-Engineer
-Do it better make it faster x11 You're my master.
+# PROJECT MIGRATION NOTICE
+**Hotkey Engineer has moved.** All active development and future updates have been migrated to platforms that better align with our commitment to independent, open-source software.
+
+### The New Hubs:
+* **Primary Home** [CodeBerg](https://codeberg.org/Eniti-Codes).
+* **Secondary Mirror** [GitLab](https://gitlab.com/Eniti-Codes). 
+
+### Important Release Info:
+* **GitHub is now a static mirror.** The code currently here is preserved for legacy use. 
+* **Stable v1.0.2 and all future versions will NOT be released on GitHub.**
+* **Exclusive Projects:** Several of my other public projects (and future secrets) are hosted exclusively on Codeberg and GitLab. Explore the profiles there to see what else is in the works.
+---
 
 **The AutoHotkey Equivalent You've Been Waiting For on Linux**
 
